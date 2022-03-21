@@ -1,0 +1,1 @@
+tämä on fullstack-kurssin harjoitusrepositorio
