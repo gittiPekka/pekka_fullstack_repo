@@ -1,5 +1,7 @@
 import { useState } from 'react'
-import Person from './components/Person'
+import FilterForm from './components/FilterForm'
+import Persons from './components/Persons'
+import PersonForm from './components/NewPerson'
 
 const App = () => {
   const [persons, setPersons] = useState([
@@ -12,8 +14,7 @@ const App = () => {
   const [newNumber, setNewNumber] = useState('')
   const [filterPersons, setFilterPersons] = useState('')
   
- 
-  const addPerson = (event) => {
+  const personAdder = (event) => {
     event.preventDefault()
     const personObject = {
       name: newPerson,
@@ -30,58 +31,29 @@ const App = () => {
     setNewPerson('');
     setNewNumber('');
   }
-  const handlePersonChange = (event) => {
+  const personChanger = (event) => {
     setNewPerson(event.target.value);
   }
-  const handleNumberChange = (event) => {
+  const numberChanger = (event) => {
     setNewNumber(event.target.value);
   }
-
-  const handleFilterChange = (event) => {
+  const filter = (event) => {
     setFilterPersons(event.target.value);
   }
-
-  const personsToShow = persons.filter(person => person.name.includes(filterPersons));
 
   return (
     <div>
       <h2>Phonebook</h2>
-      <div>
-          filter shown with
-          <input
-          value={filterPersons}
-          onChange={handleFilterChange}
-          />
-        </div>
-        <h2>add a new</h2>
-      <form onSubmit={addPerson}>
-        <div>
-          name: <input
-          value={newPerson}
-          onChange={handlePersonChange}
-          />
-        </div>
-        <div>
-          number: 
-          <input
-          value={newNumber}
-          onChange={handleNumberChange}
-          />
-        </div>
-        <div>
-          <button type="submit">add</button>
-        </div>
-        
-      </form>
+        <FilterForm filterPersons={filterPersons} handleFilterChange={filter}/>
+      <h2>add a new</h2>
+        <PersonForm addPerson={personAdder}
+          newPerson={newPerson}
+          handlePersonChange={personChanger}
+          newNumber={newNumber}
+          handleNumberChange={numberChanger}/>
       <h2>Numbers</h2>
-      <ul>
-       {personsToShow.map(person =>
-        <Person key={person.name} person={person} />
-      )}
-      </ul>
+       <Persons filterPersons={filterPersons} persons={persons} />     
       </div>
   )
-
 }
-
 export default App;
