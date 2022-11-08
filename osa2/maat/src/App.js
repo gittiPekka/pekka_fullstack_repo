@@ -8,18 +8,16 @@ const App = () => {
   const [countries, setCountries] = useState([])
   const [filterCountries, setFilterCountries] = useState('')
 
-
-
   useEffect(() => {
-    console.log('effect')
+    // console.log('effect')
     axios
       .get('https://restcountries.com/v3.1/all')
       .then(response => {
-        console.log('promise fulfilled')
+        // console.log('promise fulfilled')
         setCountries(response.data)
       })
     }, [])
-    console.log('render', countries.length, 'countries')
+    // console.log('render', countries.length, 'countries')
   
     const filter = (event) => {
       setFilterCountries(event.target.value);
@@ -27,10 +25,9 @@ const App = () => {
 
   return (
     <div>
-        <FilterForm filterCountries={filterCountries} handleFilterChange={filter}/>
-        <Countries filterCountries={filterCountries} countries={countries} /> 
-    
-      </div>
+      <FilterForm filterCountries={filterCountries} handleFilterChange={filter}/>
+      <Countries filterCountries={filterCountries} countries={countries} /> 
+    </div>
   )
 }
 export default App;
