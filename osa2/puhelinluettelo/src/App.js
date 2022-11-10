@@ -12,16 +12,16 @@ const App = () => {
 
 
   useEffect(() => {
-    console.log('effect')
+    // console.log('effect')
     axios
       .get('http://localhost:3001/persons')
       .then(response => {
-        console.log('promise fulfilled')
+        // console.log('promise fulfilled')
         setPersons(response.data)
       })
     }, [])
-    console.log('render', persons.length, 'persons')
-  
+    // console.log('render', persons.length, 'persons')
+
   const personAdder = (event) => {
     event.preventDefault()
     const personObject = {
@@ -31,7 +31,12 @@ const App = () => {
 
     const namesArray = persons.map(person => person.name);
     if (!namesArray.includes(newPerson)) {
-      setPersons(persons.concat(personObject));
+      axios
+      .post('http://localhost:3001/persons', personObject)
+      .then( (response) => {
+        // console.log("response: ", response);
+        setPersons(persons.concat(response.data));
+      })
     } else {
       alert(`${newPerson} is already added to phonebook`);
     }
@@ -39,6 +44,7 @@ const App = () => {
     setNewPerson('');
     setNewNumber('');
   }
+
   const personChanger = (event) => {
     setNewPerson(event.target.value);
   }
