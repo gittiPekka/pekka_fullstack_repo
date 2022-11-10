@@ -1,73 +1,67 @@
-import { useState, useEffect } from 'react'
-import axios from 'axios'
-import FilterForm from './components/FilterForm'
-import Persons from './components/Persons'
-import PersonForm from './components/NewPerson'
+  import {useState, useEffect} from 'react'
+  import FilterForm from './components/FilterForm'
+  import Persons from './components/Persons'
+  import PersonForm from './components/NewPerson'
+  import personActions from './services/persons'
 
-const App = () => {
-  const [persons, setPersons] = useState([])
-  const [newPerson, setNewPerson] = useState('')
-  const [newNumber, setNewNumber] = useState('')
-  const [filterPersons, setFilterPersons] = useState('')
+  const App = () => {
+    const [persons, setPersons] = useState([])
+    const [newName, setNewName] = useState('')
+    const [newNumber, setNewNumber] = useState('')
+    const [filterPersons, setFilterPersons] = useState('')
 
+    useEffect( () => {
+      personActions
+      .getAll()
+        .then(initialPersons => {
+          setPersons(initialPersons)
+          })
+        },[])
 
-  useEffect(() => {
-    // console.log('effect')
-    axios
-      .get('http://localhost:3001/persons')
-      .then(response => {
-        // console.log('promise fulfilled')
-        setPersons(response.data)
-      })
-    }, [])
-    // console.log('render', persons.length, 'persons')
-
-  const personAdder = (event) => {
-    event.preventDefault()
-    const personObject = {
-      name: newPerson,
-      number: newNumber
+    const personAdder = (event) => {
+      event.preventDefault()
+      const personObject = {
+        name: newName,
+        number: newNumber
+      }
+      const namesArray = persons.map(person => person.name);
+      if (!namesArray.includes(newName)) {
+        personActions
+        .create(personObject)
+          .then(addPerson => {
+            setPersons(persons.concat(addPerson))
+        })
+      } else {
+        alert(`${newName} is already added to phonebook`);
+      }
+      setNewName('');
+      setNewNumber('');
     }
 
-    const namesArray = persons.map(person => person.name);
-    if (!namesArray.includes(newPerson)) {
-      axios
-      .post('http://localhost:3001/persons', personObject)
-      .then( (response) => {
-        // console.log("response: ", response);
-        setPersons(persons.concat(response.data));
-      })
-    } else {
-      alert(`${newPerson} is already added to phonebook`);
+    const nameChanger = (event) => {
+      setNewName(event.target.value);
     }
 
-    setNewPerson('');
-    setNewNumber('');
-  }
+    const numberChanger = (event) => {
+      setNewNumber(event.target.value);
+    }
+    const filter = (event) => {
+      setFilterPersons(event.target.value);
+    }
 
-  const personChanger = (event) => {
-    setNewPerson(event.target.value);
+    return (
+      <div>
+        <h2>Phonebook</h2>
+          <FilterForm filterPersons={filterPersons} handleFilterChange={filter}/>
+        <h2>add a new</h2>
+          <PersonForm addPerson={personAdder}
+            newName={newName}
+            handleNameChange={nameChanger}
+            newNumber={newNumber}
+            handleNumberChange={numberChanger}/>
+        <h2>Numbers</h2>
+        <Persons filterPersons={filterPersons} persons={persons} />     
+        </div>
+    )
   }
-  const numberChanger = (event) => {
-    setNewNumber(event.target.value);
-  }
-  const filter = (event) => {
-    setFilterPersons(event.target.value);
-  }
-
-  return (
-    <div>
-      <h2>Phonebook</h2>
-        <FilterForm filterPersons={filterPersons} handleFilterChange={filter}/>
-      <h2>add a new</h2>
-        <PersonForm addPerson={personAdder}
-          newPerson={newPerson}
-          handlePersonChange={personChanger}
-          newNumber={newNumber}
-          handleNumberChange={numberChanger}/>
-      <h2>Numbers</h2>
-       <Persons filterPersons={filterPersons} persons={persons} />     
-      </div>
-  )
-}
-export default App;
+  export default App;
