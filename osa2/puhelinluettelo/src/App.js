@@ -2,7 +2,7 @@
   import FilterForm from './components/FilterForm'
   import Persons from './components/Persons'
   import PersonForm from './components/NewPerson'
-  import personActions from './services/persons'
+  import personService from './services/persons'
 
   const App = () => {
     const [persons, setPersons] = useState([])
@@ -11,7 +11,7 @@
     const [filterPersons, setFilterPersons] = useState('')
 
     useEffect( () => {
-      personActions
+      personService
       .getAll()
         .then(initialPersons => {
           setPersons(initialPersons)
@@ -26,7 +26,7 @@
       }
       const namesArray = persons.map(person => person.name);
       if (!namesArray.includes(newName)) {
-        personActions
+        personService
         .create(personObject)
           .then(addPerson => {
             setPersons(persons.concat(addPerson))
@@ -38,6 +38,17 @@
       setNewNumber('');
     }
 
+    const personRemover = event => {
+      const id = parseInt(event.currentTarget.id);
+      const person = persons.find(person => person.id === id);
+      if (window.confirm(`Delete ${person.name} ?`)) {
+        personService
+          .remove(id)
+            .then( () => {
+              setPersons(persons.filter(person => person.id !== id));
+            })
+        }
+  }
     const nameChanger = (event) => {
       setNewName(event.target.value);
     }
@@ -60,7 +71,9 @@
             newNumber={newNumber}
             handleNumberChange={numberChanger}/>
         <h2>Numbers</h2>
-        <Persons filterPersons={filterPersons} persons={persons} />     
+        <Persons filterPersons={filterPersons} 
+            removePerson={personRemover}
+            persons={persons} />     
         </div>
     )
   }

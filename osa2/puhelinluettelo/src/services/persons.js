@@ -8,13 +8,13 @@ const getAll = () => {
 }
 
 const create = newObject => {
-    const request = axios.post(baseUrl, newObject)
+    const request = axios.post(baseUrl, newObject);
     return request.then(response => response.data);
 }
 
-const personActions = {
-    getAll: getAll,
-    create: create
+const remove = (id) => {
+    const request = axios.delete(`${baseUrl}/${id}`);
+    return request.then(response => response.data);
 }
 
-export default personActions;
+export default { getAll, create, remove };
