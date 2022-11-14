@@ -18,25 +18,37 @@
           })
         },[])
 
-    const personAdder = (event) => {
-      event.preventDefault()
-      const personObject = {
-        name: newName,
-        number: newNumber
-      }
-      const namesArray = persons.map(person => person.name);
-      if (!namesArray.includes(newName)) {
-        personService
-        .create(personObject)
-          .then(addPerson => {
-            setPersons(persons.concat(addPerson))
-        })
-      } else {
-        alert(`${newName} is already added to phonebook`);
-      }
-      setNewName('');
-      setNewNumber('');
-    }
+        const personAdder = (event) => {
+          event.preventDefault()
+          const personObject = {
+            name: newName,
+            number: newNumber
+          }
+          const namesArray = persons.map(person => person.name);
+          if (!namesArray.includes(newName)) {
+            personService
+            .create(personObject)
+              .then(addPerson => {
+                setPersons(persons.concat(addPerson))
+            })
+          } else if (window.confirm(`${newName} is already added to phonebook, replace old number with a new one?`)) {
+              const personToBeChanged = persons.find(person => person.name === newName);
+              const id = personToBeChanged.id;
+              personToBeChanged.number = newNumber;
+              personService
+              .change(personToBeChanged, id)
+                .then( () => {
+                  setPersons(persons.map(person => {
+                    if (person.name === newName) {
+                      person.number = newNumber;
+                    } 
+                      return person;
+                 }))
+                 })        
+            }
+            setNewName('');
+            setNewNumber('');
+        }
 
     const personRemover = event => {
       const id = parseInt(event.currentTarget.id);
@@ -48,7 +60,8 @@
               setPersons(persons.filter(person => person.id !== id));
             })
         }
-  }
+    }
+
     const nameChanger = (event) => {
       setNewName(event.target.value);
     }
