@@ -2,13 +2,16 @@
   import FilterForm from './components/FilterForm'
   import Persons from './components/Persons'
   import PersonForm from './components/NewPerson'
+  import Notification from './components/Notification'
   import personService from './services/persons'
 
   const App = () => {
-    const [persons, setPersons] = useState([])
-    const [newName, setNewName] = useState('')
-    const [newNumber, setNewNumber] = useState('')
-    const [filterPersons, setFilterPersons] = useState('')
+    const [persons, setPersons] = useState([]);
+    const [newName, setNewName] = useState('');
+    const [newNumber, setNewNumber] = useState('');
+    const [filterPersons, setFilterPersons] = useState('');
+    const [errorMessage, setErrorMessage] = useState(null);
+    const [status, setStatus] = useState('success');
 
     useEffect( () => {
       personService
@@ -29,8 +32,16 @@
             personService
             .create(personObject)
               .then(addPerson => {
-                setPersons(persons.concat(addPerson))
+                setPersons(persons.concat(addPerson));
+                setErrorMessage(`Added ${newName}`);
             })
+            .catch(error => {
+              setStatus("error");
+              setErrorMessage(`Adding failed`);}
+              );
+              setTimeout(() => {setErrorMessage(null)}, 2000);
+              setStatus("success");
+              
           } else if (window.confirm(`${newName} is already added to phonebook, replace old number with a new one?`)) {
               const personToBeChanged = persons.find(person => person.name === newName);
               const id = personToBeChanged.id;
@@ -44,8 +55,15 @@
                     } 
                       return person;
                  }))
-                 })        
+                 setErrorMessage(`Ghanged ${newName}:s number`);
+                 })
+                 .catch(error => {
+                  setPersons(persons.filter(person => person.id !== id));        
+                  setStatus("error");
+                  setErrorMessage(`Change failed`);})    
             }
+            setTimeout(() => {setErrorMessage(null)}, 2000);
+            setStatus("success");
             setNewName('');
             setNewNumber('');
         }
@@ -58,8 +76,15 @@
           .remove(id)
             .then( () => {
               setPersons(persons.filter(person => person.id !== id));
+              setErrorMessage(`Removed ${person.name}`);
             })
+            .catch(error => {
+              setPersons(persons.filter(person => person.id !== id));
+              setStatus("error");
+              setErrorMessage(`Remove failed`);});
         }
+        setTimeout(() => {setErrorMessage(null)}, 2000);
+        setStatus("success");
     }
 
     const nameChanger = (event) => {
@@ -76,6 +101,7 @@
     return (
       <div>
         <h2>Phonebook</h2>
+          <Notification message={errorMessage} status={status}/>
           <FilterForm filterPersons={filterPersons} handleFilterChange={filter}/>
         <h2>add a new</h2>
           <PersonForm addPerson={personAdder}
